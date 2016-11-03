@@ -10,7 +10,7 @@ def parse_sql_file(the_file_contents):
             if line[0:2] == "--":
                 # Then is an sql comment and must be skipped
                 # except if it has Name
-                if "Name" in line:
+                if "Name:" in line:
                     _, name = line[2:].split(":")
                     last_test_name = name.strip()
                     # New SQL test
@@ -25,7 +25,7 @@ def parse_sql_file(the_file_contents):
     return all_tests
 
 
-def get_test_sql(name, the_tests):
+def get_transaction_set(name, the_tests):
     all_transactions = []
     for transaction_set in the_tests[name]:
         if transaction_set:

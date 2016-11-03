@@ -1,5 +1,5 @@
 import unittest
-from sqlalchemytests.tools.sql_files import parse_sql_file, get_test_sql
+from sqlalchemytests.tools.sql_files import parse_sql_file, get_transaction_set
 
 class TestSQLFileParsing(unittest.TestCase):
     def setUp(self):
@@ -54,7 +54,7 @@ condimentum mattis nisi;"""]
                              self.expected_parsed)
 
     def test_get_transactions(self):
-        self.assertItemsEqual(get_test_sql("second_test", self.expected_parsed),
+        self.assertItemsEqual(get_transaction_set("second_test", self.expected_parsed),
                               self.expected_code)
 
 if __name__ == '__main__':

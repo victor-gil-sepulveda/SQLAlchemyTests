@@ -32,12 +32,33 @@ def gen_random_hashes(num_passwords):
             range(num_passwords)]
 
 
-def get_team_names():
-    return [line.strip() for line in open(data.files["team_names"])]
+def gen_users(num_users):
+    first, mid, last = gen_random_names(num_users)
+    ages = gen_random_ages(num_users)
+    passwords = gen_random_hashes(num_users)
+
+    return [{
+        "first_name": f,
+        "mid_name": m,
+        "last_name": l,
+        "age": a,
+        "password_hash": p
+        } for f, m, l, a, p in zip(first, mid, last, ages, passwords)]
 
 
-def get_roles():
-    return list(set([line.strip().split()[0].replace("'", "") for line in open(data.files["professions"])]))
+def get_team_names(num_teams):
+    names = [line.strip() for line in open(data.files["team_names"])]
+    random.shuffle(names)
+    return names[0:num_teams]
+
+
+def get_roles(num_roles):
+    """
+    We get only a subset (20) of the roles file.
+    :return: a list of string roles
+    """
+    all_roles = list(set([line.strip().split()[0].replace("'", "") for line in open(data.files["professions"])]))
+    return [random.choice(all_roles) for _ in range(num_roles)]
 
 
 def gen_costs(num_costs):
@@ -46,11 +67,14 @@ def gen_costs(num_costs):
      in range(num_costs)]
 
 
-def gen_memberships(user_names, teams, costs, roles, max_memberships):
-    team_ids = list(set([1 + random.choice(range(len(teams))) for _ in range(max_memberships)]))
-    user_ids = list(set([1 + random.choice(range(len(user_names))) for _ in range(max_memberships)]))
+def gen_memberships(num_users, num_teams, num_roles, num_memberships):
+    team_ids = [1 + random.choice(range(num_teams)) for _ in range(num_memberships)]
+    user_ids = [1 + random.choice(range(num_users)) for _ in range(num_memberships)]
+    memb_key = list(set(zip(user_ids, team_ids)))
+
+    costs = gen_costs(num_memberships)
+    roles = get_roles(num_roles)
     return [{"user_id": user_id,
              "team_id": team_id,
              "cost": cost,
-             "role": random.choice(roles)} for user_id, team_id, cost in zip(user_ids, team_ids, costs)]
-
+             "role": random.choice(roles)} for (user_id, team_id), cost in zip(memb_key, costs)]
