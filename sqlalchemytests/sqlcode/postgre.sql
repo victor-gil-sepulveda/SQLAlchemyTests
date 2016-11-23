@@ -216,14 +216,15 @@ INSERT INTO temp_table_3
 # Get the memberships with costs with at least 3 floating
 # point positions
 #---------------------------------------------------
-CREATE OR REPLACE FUNCTION GET_NTH_DEC_POSITION(NUMERIC, INTEGER) RETURNS NUMERIC AS
+
+CREATE OR REPLACE FUNCTION GET_NTH_DEC_RESIDUE(NUMERIC, INTEGER) RETURNS NUMERIC AS
 $function$
     SELECT CAST(CAST($1 AS NUMERIC) * POW(10,$2) - FLOOR(CAST($1 AS NUMERIC)*POW(10,$2)) AS NUMERIC);
 $function$
 LANGUAGE SQL;
 
 SELECT user_id, cost, nth_pos_dec
-FROM (SELECT user_id, GET_NTH_DEC_POSITION(CAST(memberships.cost AS NUMERIC), 2) AS nth_pos_dec
+FROM (SELECT user_id, GET_NTH_DEC_RESIDUE(CAST(memberships.cost AS NUMERIC), 2) AS nth_pos_dec
       FROM users
         JOIN memberships
         USING (user_id)) AS T

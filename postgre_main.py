@@ -11,6 +11,13 @@ from sqlalchemytests.sqlcode.alchemy import alchemy_functions
 
 
 def test_alchemy(test_case_name):
+    """
+    Uses unittest functions to assess that the results from the raw SQL query are equal
+    to the ones got with SQLAlchemy.
+
+    :param test_case_name: The string describing an SQL query name and a function containing
+    the SQLAlchemy code needed to obtain the same results.
+    """
     #tc = unittest.TestCase()
     result = run_transactions(connection, get_transaction_set(test_case_name, parsed_file))
     result_alch = alchemy_functions[test_case_name]()
@@ -52,87 +59,3 @@ if __name__ == '__main__':
     test_alchemy("team_cost")
 
     connection.close()
-
-# #----------------------------------------
-# # Get all users not in a group (user id)
-# #----------------------------------------
-#
-# trans = connection.begin()
-# try:
-#     results = connection.execute("""
-# SELECT users.user_id-- , memberships.team_id -> we can add this one to check that they are really nulls
-# FROM users
-#     LEFT JOIN  memberships
-#     ON memberships.user_id = users.user_id
-# WHERE memberships.team_id IS NULL;""")
-#     #for row in results: print row
-#     trans.commit()
-# except:
-#     trans.rollback()
-#     raise
-#
-# #---------------------------------------------------
-# # Get the total cost of each team (team name, cost)
-# #---------------------------------------------------
-#
-# trans = connection.begin()
-# try:
-#     results = connection.execute("""
-# SELECT teams.team_id,teams.team_name, AVG(memberships.cost) as avg_cost
-# FROM users
-#     JOIN memberships
-#     ON memberships.user_id = users.user_id
-#     JOIN teams
-#     ON memberships.team_id = teams.team_id
-# GROUP BY teams.team_id
-# HAVING AVG(memberships.cost) > 500.
-# ORDER BY avg_cost ASC;""")
-#     #for row in results: print row
-#     trans.commit()
-# except:
-#     trans.rollback()
-#     raise
-#
-# #---------------------------
-# # Nested subqueries (in Join and ...)
-# #---------------------------
-#
-# #---------------------------
-# # And the same with a view
-# #---------------------------
-#
-# #---------------------------------------------------
-# # Get the memberships with costs with 2 or less
-# # floating point positions
-# #---------------------------------------------------
-# CREATE FUNCTION SUPER_ROUND(NUMERIC, INTEGER) RETURNS NUMERIC AS
-# $function$
-#     SELECT ROUND(CAST(ROUND(CAST($1 AS NUMERIC),$2)*POW(10,$2) - FLOOR($1)*POW(10,$2) AS NUMERIC),$2);
-# $function$
-# LANGUAGE SQL;
-#
-# CREATE FUNCTION REMAINING_DECIMAL(NUMERIC, INTEGER) RETURNS NUMERIC AS
-# $function$
-#     SELECT SUPER_ROUND($1, $2) - FLOOR(SUPER_ROUND($1, $2));
-# $function$
-# LANGUAGE SQL;
-#
-# SELECT users.user_id, memberships.cost, REMAINING_DECIMAL(CAST(memberships.cost AS NUMERIC),2)
-# FROM users
-# JOIN memberships
-# ON memberships.user_id = users.user_id
-# WHERE REMAINING_DECIMAL(CAST(memberships.cost AS NUMERIC),2) <> 0;
-#
-# #---------------------------------------------------
-# # Get the memberships with costs with exxactly 2
-# # floating point positions
-# #---------------------------------------------------
-#
-#
-# # stored procedures, try to have always updated a table with the number of users logged per day
-# # new transction, BEGIN issued
-# #result = connection.execute("select username from users")
-# # ended transaction, COMMIT issued
-# connection.close()
-#
-#
